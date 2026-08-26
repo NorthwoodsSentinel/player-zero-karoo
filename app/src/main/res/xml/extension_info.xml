@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExtensionInfo
+    displayName="@string/extension_name"
+    icon="@drawable/ic_playerzero"
+    id="playerzero"
+    scansDevices="false">
+    <DataType
+        description="Onewheel pack battery percentage — reads --% until the board is authenticated"
+        displayName="Board Battery"
+        graphical="false"
+        icon="@drawable/ic_playerzero"
+        typeId="board_battery" />
+    <DataType
+        description="Onewheel motor temperature in celsius"
+        displayName="Motor Temp"
+        graphical="false"
+        icon="@drawable/ic_playerzero"
+        typeId="motor_temp" />
+    <DataType
+        description="Onewheel safety headroom — low values mean pushback imminent"
+        displayName="Safety Headroom"
+        graphical="false"
+        icon="@drawable/ic_playerzero"
+        typeId="safety_headroom" />
+    <DataType
+        description="Onewheel motor current in amps"
+        displayName="Board Amps"
+        graphical="false"
+        icon="@drawable/ic_playerzero"
+        typeId="board_amps" />
+    <DataType
+        description="Onewheel speed derived from motor RPM"
+        displayName="Board Speed"
+        graphical="false"
+        icon="@drawable/ic_playerzero"
+        typeId="board_speed" />
+</ExtensionInfo>

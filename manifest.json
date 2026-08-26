@@ -1,0 +1,12 @@
+{
+  "label": "Player Zero",
+  "packageName": "com.northwoods.playerzero.karoo",
+  "iconUrl": "https://github.com/NorthwoodsSentinel/player-zero-karoo/releases/latest/download/icon-512.png",
+  "latestApkUrl": "https://github.com/NorthwoodsSentinel/player-zero-karoo/releases/latest/download/player-zero-karoo-v0.1.0.apk",
+  "latestVersion": "0.1.0",
+  "latestVersionCode": 1,
+  "developer": "NorthWoods Sentinel",
+  "description": "Onewheel GT/GT-S battery, motor temp, safety headroom, amps and speed as Karoo data fields, over a direct Bluetooth link to the board. Nothing leaves the Karoo.",
+  "releaseNotes": "0.1.0: first release — the Onewheel connector from veloVigil, now its own extension.",
+  "tags": ["sensors"]
+}
