@@ -3,7 +3,7 @@
 # Always cleans first (Kotlin constant-folds BuildConfig.VERSION_NAME; incremental builds ship stale banners).
 #
 # Needs: ANDROID_HOME (default /opt/android-sdk), GITHUB_TOKEN with read:packages (or `gh auth token`),
-#        PLAYERZERO_KEYSTORE_PASS or ~/.claude/.secrets/velovigil-keystore-pass (same NorthWoods keystore).
+#        PLAYERZERO_KEYSTORE_PASS or ~/.claude/.secrets/velovigil-keystore-pass-v3 (same NorthWoods keystore).
 # Usage: scripts/release.sh            OUT_DIR=/dir scripts/release.sh  (also copies the APK there)
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -13,9 +13,9 @@ export GITHUB_USER="${GITHUB_USER:-NorthwoodsSentinel}"
 export GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}"
 [ -n "$GITHUB_TOKEN" ] || { echo "no GITHUB_TOKEN (read:packages) — karoo-ext dependency will 401" >&2; exit 2; }
 
-KS="velovigil-release-v2.keystore"
+KS="velovigil-release-v3.keystore"
 ALIAS="velovigil"
-PASS="${PLAYERZERO_KEYSTORE_PASS:-$(cat "$HOME/.claude/.secrets/velovigil-keystore-pass" 2>/dev/null || true)}"
+PASS="${PLAYERZERO_KEYSTORE_PASS:-$(cat "$HOME/.claude/.secrets/velovigil-keystore-pass-v3" 2>/dev/null || true)}"
 [ -n "$PASS" ] || { echo "no keystore password" >&2; exit 2; }
 
 VERSION=$(grep -E 'versionName = "' app/build.gradle.kts | sed -E 's/.*"([^"]+)".*/\1/')
