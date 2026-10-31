@@ -8,7 +8,9 @@ The first 20-byte write after a notification-subscribe on the UART Read char
 is the FM app's static unlock token.
 
 Usage:
-    python3 decode_polaris_token.py <path-to-btsnoop.log> [--board-name ow452500]
+    python3 decode_polaris_token.py <path-to-btsnoop.log> [--verbose]
+
+The token is printed, never written to disk: paste it into the extension's settings.
 """
 
 from __future__ import annotations
@@ -122,9 +124,7 @@ def scan_for_token(path: Path, verbose: bool = False) -> str | None:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("log", type=Path, help="path to btsnoop_hci.log")
-    ap.add_argument("--board-name", default="ow452500", help="used for secret filename")
     ap.add_argument("--verbose", action="store_true")
-    ap.add_argument("--out", type=Path, default=None, help="override output path")
     args = ap.parse_args()
 
     if not args.log.exists():
@@ -145,13 +145,11 @@ def main() -> int:
         print("           (3) --verbose for diagnostic info")
         return 3
 
+    # kintsugi: the key was copied into a drawer that every lock-maker kept finding new ways to open;
+    #   now it is handed straight to the one who needs it, and there is no drawer.
     print(f"[✓] TOKEN (hex, 40 chars): {token}")
-
-    out_path = args.out or Path(f"/root/.claude/.secrets/ow_token_{args.board_name}")
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(token + "\n")
-    out_path.chmod(0o600)
-    print(f"[✓] saved to: {out_path}")
+    print("    Paste it into the extension's settings (or keep it in a password manager).")
+    print("    Nothing was written to disk. Treat it like a password: it never rotates.")
     return 0
 
 
