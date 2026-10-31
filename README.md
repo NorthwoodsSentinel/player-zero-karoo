@@ -18,17 +18,21 @@ out on 2026-08-26 so a cyclist's app never carries a board token.
    open it from Settings → System → File Manager).
 3. Open **Player Zero** on the Karoo. Allow Location (Karoo 2) / Nearby devices (Karoo 3) — the BLE scan
    cannot run without it.
-4. Enter your board's BLE name (e.g. `ow452500`) and its Polaris token
+4. Enter your board's BLE name (e.g. `owXXXXXX`) and its Polaris token
    ([how to get it](docs/POLARIS_TOKEN_EXTRACTION.md)). **Save & connect.**
 5. Add the fields to a ride page: they live under **Player Zero** in the data-field picker.
 
-Or push the config in one go, no typing on the Karoo:
+Or push the config in one go, no typing on the Karoo. The token is a password, so it is piped straight to
+the Karoo and never written to a file on your computer (the extension removes its copy once imported):
 
 ```sh
-printf '{"board_name":"ow452500","polaris_token":"<40 hex>"}' > config.json
-adb push config.json /sdcard/Android/data/com.northwoods.playerzero.karoo/files/config.json
+printf '{"board_name":"owXXXXXX","polaris_token":"<40 hex>"}' \
+  | adb shell 'cat > /sdcard/Android/data/com.northwoods.playerzero.karoo/files/config.json'
 adb shell am start -n com.northwoods.playerzero.karoo/.SettingsActivity
 ```
+
+The token will be in your shell history after this; clear that line (or start the command with a space if
+your shell is set to ignore those) if other people use this computer.
 
 ## Proof it's connected
 

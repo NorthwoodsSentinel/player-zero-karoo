@@ -1,6 +1,6 @@
 # Polaris Token Extraction — GT-S Board
 
-Goal: obtain the 20-byte static auth token that the Future Motion app writes to the Onewheel UART on connect. Once captured, this token unlocks your board's telemetry characteristics over BLE without your phone in the loop — making it usable from the Karoo extension, Leroy directly, or anywhere.
+Goal: obtain the 20-byte static auth token that the Future Motion app writes to the Onewheel UART on connect. Once captured, this token unlocks your board's telemetry characteristics over BLE without your phone in the loop, so the Karoo extension can read them directly.
 
 **One-time procedure. The token is board-specific and persists across firmware updates.**
 
@@ -57,35 +57,28 @@ adb bugreport ~/Downloads/bugreport.zip
 - Samsung: Settings → Developer options → "Take bug report" → share to Drive/email
 - Pixel: Settings → System → Developer options → "Take bug report"
 
-## Step 4 — Drop the log to Leroy's inbox and decode
+## Step 4 — Decode the token
+
+From a checkout of this repo, on the machine that has the log:
 
 ```bash
-# From your laptop, copy to Drive inbox or scp to Lares
-# Then from Leroy:
-cd /root/projects/velovigil-karoo/scripts
-python3 decode_polaris_token.py ~/Downloads/btsnoop.log
+python3 scripts/decode_polaris_token.py ~/Downloads/btsnoop.log
 ```
 
-Expected output:
+Expected output (the token below is a placeholder; yours will be 40 hex characters):
 
 ```
-[*] Parsing btsnoop: ~/Downloads/btsnoop.log
-[*] Found Onewheel service: e659f300-ea98-11e3-ac10-0800200c9a66
-[*] Found 2 GATT write packets to UART Write char (f3ff)
-[*] First 20-byte write: 8b4f3ce9...  ← candidate unlock token
-[✓] TOKEN (hex, 40 chars): 8b4f3ce9a2d7b14c5f8e0192af3c6d7b82e91405
-[✓] Saved to: /root/.claude/.secrets/ow_token_ow452500
+[*] parsing btsnoop: ~/Downloads/btsnoop.log
+[✓] TOKEN (hex, 40 chars): <40 hex characters>
+    Paste it into the extension's settings (or keep it in a password manager).
+    Nothing was written to disk. Treat it like a password: it never rotates.
 ```
+
+The script never writes the token to disk; copy it from the terminal. Add `--verbose` to see which BLE writes it considered.
 
 ## Step 5 — Verify
 
-From Leroy, re-run the probe script with the token:
-
-```bash
-python3 /tmp/ow_probe.py --token "$(cat /root/.claude/.secrets/ow_token_ow452500)"
-```
-
-Expected: battery %, motor temp, amps, headroom all return real values instead of `0000`.
+Enter the board name and token in the extension's settings (or import them with `config.json`, see the README). Battery %, motor temp, amps and headroom should show real values instead of `0000`.
 
 ## Troubleshooting
 
@@ -98,16 +91,12 @@ Expected: battery %, motor temp, amps, headroom all return real values instead o
 
 ## Security note
 
-This token is not a universal key — it's specific to your board's pairing identity. It's what the FM app has been using all along; you're just mirroring what it already knows. Compliance with the DMCA interoperability exemption (see `skills/Domain/Onewheel/SKILL.md` line 114).
+This token is not a universal key: it's specific to your board's pairing identity. It's what the FM app has been using all along; you're just mirroring what it already knows. This is interoperability work on hardware you own.
 
-Keep the token at `/root/.claude/.secrets/ow_token_ow452500` — gitignored, never commit.
+**Treat the token like a password.** It does not expire or rotate, so anyone who has it can read your board's telemetry over BLE when they're in range. Keep it out of git, screenshots, issues and chat logs. If it leaks, the only remedy is re-pairing the board.
 
 ## What happens after
 
-Once the token is stored:
+Once the token is stored, the Karoo extension reads it from the `SettingsActivity` field (pasted once, or imported with `config.json`). `OnewheelConnector.kt` runs the static-token auth path, and the Karoo data fields show live board state. Nothing leaves the Karoo; there is no backend.
 
-1. **Leroy can pull board telemetry any time** via `python3 /tmp/ow_probe.py` — authenticated read of battery, temp, amps, headroom, RPM, pitch, roll
-2. **Karoo extension** reads the token from `SettingsActivity` field (pasted once) → `OnewheelConnector.kt` runs the static-token auth path → Karoo display fields show real board state + uploads to fleet worker
-3. **Player Zero phone app** stores it in AsyncStorage keyed by board name → no re-capture needed on reinstalls
-
-The token does not expire or rotate. Capture once, use forever (unless FM firmware changes the auth scheme — currently stable since Polaris fw 6215).
+The token stays valid until FM firmware changes the auth scheme (stable since Polaris fw 6215).
